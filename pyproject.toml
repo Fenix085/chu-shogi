@@ -1,7 +1,7 @@
 [project]
 name = "chu-shogi"
 version = "0.1.0"
-description = "Add your description here"
+description = "Chu-Shogi engine for playing and training bots"
 readme = "README.md"
 authors = [
     { name = "Fenix085", email = "vladimirhurtovyi@gmail.com" }
