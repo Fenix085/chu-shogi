@@ -6,8 +6,8 @@ class Movement(enum.Enum):
     step = "step"
     line = "line"
     jump = "jump"
-    lion_line = "liom_line"
-    liom_area = "lion_area"
+    lion_line = "lion_line"
+    lion_area = "lion_area"
 
 Direction = tuple[int, int]
 Rule = tuple[Movement, Direction | None]
@@ -36,7 +36,7 @@ PT = PieceType
 MOVES: dict[PieceType, list[Rule]] = {
     PT.king: steps(*ALL_DIRECTIONS),
     PT.queen: lines(*ALL_DIRECTIONS),
-    PT.lion: steps(*ALL_DIRECTIONS),
+    PT.lion: [(Movement.lion_area, None)],
     PT.dragon_king: steps(*DIAGONAL) + lines(*ORTHOGONAL),
     PT.dragon_horse: steps(*ORTHOGONAL) + lines(*DIAGONAL),
     PT.rook: lines(*ORTHOGONAL),
@@ -57,14 +57,16 @@ MOVES: dict[PieceType, list[Rule]] = {
     PT.pawn: steps(N),
 
     PT.flying_stag: steps(NW, NE, W, E, SW, SE) + lines(N, S),
-    PT.horned_falcon: steps(*ALL_DIRECTIONS),
-    PT.soaring_eagle: steps(*ALL_DIRECTIONS),
+    PT.horned_falcon: lion_lines(N) + lines(NW, NE, W, E, SW, S, SE),
+    PT.soaring_eagle: lion_lines(NW, NE) + lines(N, W, E, SW, S, SE),
     PT.prince: steps(*ALL_DIRECTIONS),
     PT.whale: lines(N, SW, S, SE),
     PT.white_horse: lines(NW, N, NE, S),
     PT.free_boar: lines(NW, W, SW, NE, E, SE),
     PT.flying_ox: lines(NW, N, NE, SW, S, SE),
     }
+
+assert set(MOVES) == set(PieceType)
 
 def _rotate(rule: Rule) -> Rule:
     kind, d = rule

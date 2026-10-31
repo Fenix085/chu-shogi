@@ -17,11 +17,12 @@ class Point(NamedTuple):
     def offset(self, dr: int, dc: int) -> "Point":
         return Point(self.row + dr, self.col + dc)
 
-class Movement(enum.Enum):
-    step = "step"
-    jump = "jump"
-    line = "line"
-    igui = "igui"
+@dataclass(frozen=True)
+class Move:
+    from_point: Point
+    to_point: Point
+    via: Point | None = None#for lion moves
+    promote: bool = False
 
 class PieceType(enum.Enum):
     king = 1

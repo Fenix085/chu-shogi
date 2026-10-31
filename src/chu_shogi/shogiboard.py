@@ -49,7 +49,6 @@ class Board:
         if promote and not piece.can_promote:
             raise ValueError(f"{piece} cannot promote")
 
-        self.remove(from_point)
         captured = self.remove(to_point) if target is not None else None
         self.place(to_point, piece.promote() if promote else piece)
         return captured
