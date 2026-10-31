@@ -41,15 +41,17 @@ class Board:
 
     def move(self, from_point: Point, to_point: Point, promote: bool = False) -> Piece | None:
         piece = self.remove(from_point)
-        captured = None
-        if to_point in self._grid:
-            if self._grid[to_point].colour == piece.colour:
-                self.place(from_point, piece)
-                raise ValueError(f"{to_point} has a friendly unit")
-            captured = self.remove(to_point)
-        if promote:
-            piece = piece.promote()
-        self.place(to_point, piece)
+        if piece is None:
+            raise ValueError(f"no piece at {from_point}")
+        target = self._grid.get(to_point)
+        if target is not None and target.colour == piece.colour:
+            raise ValueError(f"{to_point} has a friendly unit")
+        if promote and not piece.can_promote:
+            raise ValueError(f"{piece} cannot promote")
+
+        self.remove(from_point)
+        captured = self.remove(to_point) if target is not None else None
+        self.place(to_point, piece.promote() if promote else piece)
         return captured
 
     def copy(self) -> "Board":
