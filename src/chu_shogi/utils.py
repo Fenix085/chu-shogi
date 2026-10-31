@@ -31,8 +31,10 @@ SYMBOL_TO_TYPE = {s: pt for pt, s in PIECE_SYMBOLS.items()}
 
 EMPTY = "."
 
+
 def coords_from_point(point: Point) -> str:
     return f"{BOARD_SIZE + 1 - point.col}{RANKS[point.row - 1]}"
+
 
 def point_from_coords(coords: str) -> Point:
     coords = coords.strip()
@@ -44,9 +46,11 @@ def point_from_coords(coords: str) -> Point:
         raise ValueError(f"bad input {coords!r}")
     return Point(row=RANKS.index(rank) + 1, col=BOARD_SIZE + 1 - file)
 
+
 def piece_to_str(piece: Piece) -> str:
     s = ("+" if piece.promoted else "") + PIECE_SYMBOLS[piece.piece_type]
     return s if piece.colour == Player.black else s.lower()
+
 
 def piece_from_str(s: str) -> Piece:
     promoted = s.startswith("+")
@@ -62,7 +66,7 @@ def piece_from_str(s: str) -> Piece:
         piece_type = SYMBOL_TO_TYPE[body.upper()]
     except KeyError:
         raise ValueError(f"bad piece {s!r}") from None
-    
+
     return Piece(piece_type, colour, promoted)
 
 
@@ -70,6 +74,7 @@ def move_to_str(move: Move) -> str:
     squares = [move.from_point] + ([move.via] if move.via else []) + [move.to_point]
     s = "-".join(coords_from_point(p) for p in squares)
     return s + ("+" if move.promote else "")
+
 
 def move_from_str(s: str) -> Move:
     s = s.strip()
@@ -80,6 +85,7 @@ def move_from_str(s: str) -> Move:
     points = [point_from_coords(p) for p in parts]
     via = points[1] if len(points) == 3 else None
     return Move(points[0], points[-1], via, promote)
+
 
 def print_move(player: Player, move: Move) -> None:
     print(f"{player.name} {move_to_str(move)}")
@@ -96,8 +102,10 @@ def board_to_str(board: Board) -> str:
         lines.append("".join(cells) + f" {RANKS[row - 1]}")
     return "\n".join(lines)
 
+
 def print_board(board: Board) -> None:
     print(board_to_str(board))
+
 
 def board_from_str(text: str) -> Board:
     board = Board()
@@ -109,7 +117,9 @@ def board_from_str(text: str) -> Board:
         if len(tokens) == BOARD_SIZE + 1 and tokens[-1] in RANKS:
             tokens = tokens[:-1]
         if len(tokens) != BOARD_SIZE:
-            raise ValueError(f"expected {BOARD_SIZE} cells, got {len(tokens)}: {line!r}")
+            raise ValueError(
+                f"expected {BOARD_SIZE} cells, got {len(tokens)}: {line!r}"
+            )
         rows.append(tokens)
     if len(rows) != BOARD_SIZE:
         raise ValueError(f"expected {BOARD_SIZE} rows, got {len(rows)}")

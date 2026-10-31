@@ -3,6 +3,7 @@ from .shogitypes import Piece, Point
 
 BOARD_SIZE = 12
 
+
 class Board:
     def __init__(self) -> None:
         self.num_rows = BOARD_SIZE
@@ -11,7 +12,7 @@ class Board:
         self._hash = zobrist.EMPTY_BOARD
 
     def is_on_grid(self, point: Point) -> bool:
-        return 1 <= point.row <=self.num_rows and 1 <= point.col <= self.num_cols
+        return 1 <= point.row <= self.num_rows and 1 <= point.col <= self.num_cols
 
     def get(self, point: Point) -> Piece | None:
         return self._grid.get(point)
@@ -28,7 +29,7 @@ class Board:
         if point in self._grid:
             raise ValueError(f"{point} is already occupied")
         self._grid[point] = piece
-        self._hash ^=zobrist.HASH_CODE[point, piece]
+        self._hash ^= zobrist.HASH_CODE[point, piece]
 
     def remove(self, point: Point) -> Piece:
         if not self.is_on_grid(point):
@@ -39,7 +40,9 @@ class Board:
         self._hash ^= zobrist.HASH_CODE[point, piece]
         return piece
 
-    def move(self, from_point: Point, to_point: Point, promote: bool = False) -> Piece | None:
+    def move(
+        self, from_point: Point, to_point: Point, promote: bool = False
+    ) -> Piece | None:
         piece = self.remove(from_point)
         if piece is None:
             raise ValueError(f"no piece at {from_point}")
@@ -58,4 +61,3 @@ class Board:
         new._grid = dict(self._grid)
         new._hash = self._hash
         return new
-            

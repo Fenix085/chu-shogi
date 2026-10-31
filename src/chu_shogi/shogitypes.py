@@ -2,6 +2,7 @@ import enum
 from dataclasses import dataclass, replace
 from typing import NamedTuple
 
+
 class Player(enum.Enum):
     white = 1
     black = 2
@@ -10,6 +11,7 @@ class Player(enum.Enum):
     def other(self):
         return Player.white if self == Player.black else Player.black
 
+
 class Point(NamedTuple):
     row: int
     col: int
@@ -17,12 +19,14 @@ class Point(NamedTuple):
     def offset(self, dr: int, dc: int) -> "Point":
         return Point(self.row + dr, self.col + dc)
 
+
 @dataclass(frozen=True)
 class Move:
     from_point: Point
     to_point: Point
-    via: Point | None = None#for lion moves
+    via: Point | None = None  # for lion moves
     promote: bool = False
+
 
 class PieceType(enum.Enum):
     king = 1
@@ -55,7 +59,7 @@ class PieceType(enum.Enum):
     white_horse = 27
     free_boar = 28
     flying_ox = 29
-    
+
 
 PROMOTED_MOVEMENT = {
     PieceType.pawn: PieceType.gold_general,
@@ -78,16 +82,19 @@ PROMOTED_MOVEMENT = {
     PieceType.dragon_king: PieceType.soaring_eagle,
 }
 
-PROMOTED_ONLY: frozenset[PieceType] = frozenset({
-    PieceType.flying_ox,
-    PieceType.flying_stag,
-    PieceType.free_boar,
-    PieceType.horned_falcon,
-    PieceType.prince,
-    PieceType.soaring_eagle,
-    PieceType.whale,
-    PieceType.white_horse,
-})
+PROMOTED_ONLY: frozenset[PieceType] = frozenset(
+    {
+        PieceType.flying_ox,
+        PieceType.flying_stag,
+        PieceType.free_boar,
+        PieceType.horned_falcon,
+        PieceType.prince,
+        PieceType.soaring_eagle,
+        PieceType.whale,
+        PieceType.white_horse,
+    }
+)
+
 
 @dataclass(frozen=True)
 class Piece:
@@ -117,7 +124,8 @@ class Piece:
         return self.piece_type == PieceType.king or (
             self.piece_type == PieceType.drunk_elephant and self.promoted
         )
-    
+
+
 def movement_type(piece: Piece) -> PieceType:
     if not piece.promoted:
         return piece.piece_type

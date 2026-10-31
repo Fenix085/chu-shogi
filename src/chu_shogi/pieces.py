@@ -2,12 +2,14 @@ import enum
 
 from .shogitypes import Piece, PieceType, Player, movement_type
 
+
 class Movement(enum.Enum):
     step = "step"
     line = "line"
     jump = "jump"
     lion_line = "lion_line"
     lion_area = "lion_area"
+
 
 Direction = tuple[int, int]
 Rule = tuple[Movement, Direction | None]
@@ -19,17 +21,22 @@ ORTHOGONAL = (N, S, E, W)
 DIAGONAL = (NE, NW, SE, SW)
 ALL_DIRECTIONS = ORTHOGONAL + DIAGONAL
 
+
 def steps(*dirs: Direction) -> list[Rule]:
     return [(Movement.step, d) for d in dirs]
+
 
 def lines(*dirs: Direction) -> list[Rule]:
     return [(Movement.line, d) for d in dirs]
 
+
 def jumps(*dirs: Direction) -> list[Rule]:
     return [(Movement.jump, (2 * dr, 2 * dc)) for dr, dc in dirs]
 
+
 def lion_lines(*dirs: Direction) -> list[Rule]:
     return [(Movement.lion_line, d) for d in dirs]
+
 
 PT = PieceType
 
@@ -55,7 +62,7 @@ MOVES: dict[PieceType, list[Rule]] = {
     PT.lance: lines(N),
     PT.go_between: steps(N, S),
     PT.pawn: steps(N),
-
+    
     PT.flying_stag: steps(NW, NE, W, E, SW, SE) + lines(N, S),
     PT.horned_falcon: lion_lines(N) + lines(NW, NE, W, E, SW, S, SE),
     PT.soaring_eagle: lion_lines(NW, NE) + lines(N, W, E, SW, S, SE),
@@ -64,18 +71,21 @@ MOVES: dict[PieceType, list[Rule]] = {
     PT.white_horse: lines(NW, N, NE, S),
     PT.free_boar: lines(NW, W, SW, NE, E, SE),
     PT.flying_ox: lines(NW, N, NE, SW, S, SE),
-    }
+}
 
 assert set(MOVES) == set(PieceType)
+
 
 def _rotate(rule: Rule) -> Rule:
     kind, d = rule
     return (kind, None if d is None else (-d[0], -d[1]))
 
+
 _MOVES_BY_PLAYER: dict[Player, dict[PieceType, list[Rule]]] = {
     Player.black: MOVES,
     Player.white: {pt: [_rotate(r) for r in rules] for pt, rules in MOVES.items()},
 }
+
 
 def rules_for(piece: Piece) -> list[Rule]:
     return _MOVES_BY_PLAYER[piece.colour][movement_type(piece)]

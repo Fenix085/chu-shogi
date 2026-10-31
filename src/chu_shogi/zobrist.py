@@ -1,8 +1,16 @@
 import random
 
-from .shogitypes import Player, Point, Piece, PieceType, PROMOTED_MOVEMENT, PROMOTED_ONLY
+from .shogitypes import (
+    Player,
+    Point,
+    Piece,
+    PieceType,
+    PROMOTED_MOVEMENT,
+    PROMOTED_ONLY,
+)
 
 BOARD_SIZE = 12
+
 
 def _all_pieces():
     for player in Player:
@@ -12,6 +20,7 @@ def _all_pieces():
             yield Piece(piece_type, player)
             if piece_type in PROMOTED_MOVEMENT:
                 yield Piece(piece_type, player, promoted=True)
+
 
 _rng = random.Random(42)
 
