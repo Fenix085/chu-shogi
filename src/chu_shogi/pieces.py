@@ -62,7 +62,7 @@ MOVES: dict[PieceType, list[Rule]] = {
     PT.lance: lines(N),
     PT.go_between: steps(N, S),
     PT.pawn: steps(N),
-    
+#--------------------------------------------------
     PT.flying_stag: steps(NW, NE, W, E, SW, SE) + lines(N, S),
     PT.horned_falcon: lion_lines(N) + lines(NW, NE, W, E, SW, S, SE),
     PT.soaring_eagle: lion_lines(NW, NE) + lines(N, W, E, SW, S, SE),

@@ -2,6 +2,7 @@ from .shogitypes import Point, Move, Player
 from .shogiboard import Board
 from .pieces import Movement, rules_for
 
+
 def piece_moves(board: Board, point: Point) -> list[Move]:
     piece = board.get(point)
     if piece is None:
@@ -13,10 +14,10 @@ def piece_moves(board: Board, point: Point) -> list[Move]:
                 target = point.offset(dr, dc)
                 if _can_land(board, target, piece.colour):
                     moves.append(Move(point, target))
-                
+
             case (Movement.line, (dr, dc)):
                 target = point.offset(dr, dc)
-                
+
                 while _can_land(board, target=target, colour=piece.colour):
                     t_cell = board.get(target)
                     moves.append(Move(point, target))
@@ -24,10 +25,11 @@ def piece_moves(board: Board, point: Point) -> list[Move]:
                         target = Point.offset(target, dr, dc)
                     else:
                         break
-                    
+
             case _:
                 raise NotImplementedError(f"{rule} is not implemented")
     return moves
+
 
 def _can_land(board: Board, target: Point, colour: Player) -> bool:
     """
@@ -39,11 +41,11 @@ def _can_land(board: Board, target: Point, colour: Player) -> bool:
             return True
         elif t_cell.colour != colour:
             return True
-        else: 
+        else:
             return False
     else:
         return False
-        
+
 
 if __name__ == "__main__":
     pass
