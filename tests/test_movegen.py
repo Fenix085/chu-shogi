@@ -48,7 +48,7 @@ def test_king_in_middle():
         (PieceType.lance, False, 5),
         (PieceType.go_between, False, 2),
         (PieceType.pawn, False, 1),
-        #--------------------------------------------------
+        # --------------------------------------------------
         (PieceType.blind_tiger, True, 17),  # flying stag
         # horned_falcon skipped
         # soaring_eagle skipped

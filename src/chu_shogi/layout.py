@@ -18,7 +18,7 @@ BLACK_SETUP: tuple[tuple[PieceType, Point], ...] = (
     (PieceType.gold_general, Point(12, 8)),
     (PieceType.king, Point(12, 6)),
     (PieceType.drunk_elephant, Point(12, 7)),
-#--------------------------------------------------
+    # --------------------------------------------------
     (PieceType.reverse_chariot, Point(11, 1)),
     (PieceType.reverse_chariot, Point(11, 12)),
     (PieceType.bishop, Point(11, 3)),
@@ -27,7 +27,7 @@ BLACK_SETUP: tuple[tuple[PieceType, Point], ...] = (
     (PieceType.blind_tiger, Point(11, 8)),
     (PieceType.kirin, Point(11, 6)),
     (PieceType.phoenix, Point(11, 7)),
-#--------------------------------------------------
+    # --------------------------------------------------
     (PieceType.side_mover, Point(10, 1)),
     (PieceType.side_mover, Point(10, 12)),
     (PieceType.vertical_mover, Point(10, 2)),
@@ -40,7 +40,7 @@ BLACK_SETUP: tuple[tuple[PieceType, Point], ...] = (
     (PieceType.dragon_king, Point(10, 8)),
     (PieceType.lion, Point(10, 6)),
     (PieceType.queen, Point(10, 7)),
-#--------------------------------------------------
+    # --------------------------------------------------
     (PieceType.pawn, Point(9, 1)),
     (PieceType.pawn, Point(9, 2)),
     (PieceType.pawn, Point(9, 3)),
@@ -53,7 +53,7 @@ BLACK_SETUP: tuple[tuple[PieceType, Point], ...] = (
     (PieceType.pawn, Point(9, 10)),
     (PieceType.pawn, Point(9, 11)),
     (PieceType.pawn, Point(9, 12)),
-#--------------------------------------------------
+    # --------------------------------------------------
     (PieceType.go_between, Point(8, 4)),
     (PieceType.go_between, Point(8, 9)),
 )
