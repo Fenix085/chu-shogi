@@ -29,7 +29,7 @@ def test_king_in_middle():
     (PieceType.rook, False, 22),
     (PieceType.bishop, False, 21),
     (PieceType.dragon_king, False, 26),
-    (PieceType.dragon_horse, False, 26),
+    (PieceType.dragon_horse, False, 25),
     (PieceType.kirin, False, 8),
     (PieceType.phoenix, False, 8),
     (PieceType.drunk_elephant, False, 7),
