@@ -2,8 +2,8 @@ import pytest
 
 from chu_shogi.movegen import piece_moves
 from chu_shogi.shogiboard import Board
-from chu_shogi.shogitypes import Point, Player, Piece, PieceType
-from chu_shogi.utils import coords_from_point, point_from_coords
+from chu_shogi.shogitypes import Point, Player, Piece, PieceType, Move
+from chu_shogi.utils import coords_from_point, point_from_coords, move_to_str, move_from_str
 from chu_shogi.layout import rotate
 
 
@@ -18,6 +18,17 @@ def targets(board: Board, point: Point) -> set[str]:
     moves = piece_moves(board, point)
     return {coords_from_point(m.to_point) for m in moves}
 
+def targets_lion(board: Board, point: Point) -> list[str]:
+    return [move_to_str(m) for m in piece_moves(board, point)]
+
+def assert_no_duplicates(moves) -> None:
+    assert len(moves) == len(set(moves))
+
+def rotate_move(m: Move) -> Move:
+    from_point, to_point, via = m.from_point, m.to_point, m.via
+    return Move(rotate(from_point), rotate(to_point), (rotate(via) if via is not None else None), m.promote)
+
+# ------ TESTS --------------------------------------------------------
 
 def test_king_in_middle():
     board = board_with((Point(6, 6), Piece(PieceType.king, Player.black)))
@@ -174,3 +185,69 @@ def test_pawn_last_rank_white():
     board = board_with((Point(12, 12), Piece(PieceType.pawn, Player.white, False)))
     _targets = targets(board, Point(12, 12))
     assert _targets == set()
+
+def test_lion_in_middle():
+    board = board_with((Point(6, 6), Piece(PieceType.lion, Player.black, False)))
+    _targets = targets_lion(board, Point(6, 6))
+    assert_no_duplicates(_targets)
+    LION_7F_SQUARE = {f"7f-{sq}" for sq in ["5d", "5e", "5f", "5g", "5h", 
+                                            "6d", "6e", "6f", "6g", "6h", 
+                                            "7d", "7e", "7g", "7h", 
+                                            "8d", "8e", "8f", "8g", "8h", 
+                                            "9d", "9e", "9f", "9g", "9h"]}
+    assert set(_targets) == LION_7F_SQUARE | {"7f-7f"}
+
+def test_lion_with_friends():
+    board = board_with((Point(6, 6), Piece(PieceType.lion, Player.black, False)), 
+    (Point(5, 5), Piece(PieceType.copper_general, Player.black, False)),
+    (Point(5, 6), Piece(PieceType.copper_general, Player.black, False)),
+    (Point(5, 7), Piece(PieceType.copper_general, Player.black, False)),
+    (Point(6, 5), Piece(PieceType.copper_general, Player.black, False)),
+    (Point(6, 7), Piece(PieceType.copper_general, Player.black, False)),
+    (Point(7, 5), Piece(PieceType.copper_general, Player.black, False)),
+    (Point(7, 6), Piece(PieceType.copper_general, Player.black, False)),
+    (Point(7, 7), Piece(PieceType.copper_general, Player.black, False)),)
+    
+    _targets = targets_lion(board, Point(6, 6))
+    assert_no_duplicates(_targets)
+    LION_7F_SQUARE = {f"7f-{sq}" for sq in ["5d", "5e", "5f", "5g", "5h", 
+                                            "6d", "6h", 
+                                            "7d", "7h", 
+                                            "8d", "8h", 
+                                            "9d", "9e", "9f", "9g", "9h"]}
+    assert set(_targets) == LION_7F_SQUARE
+
+def test_lion_in_corner():
+    board = board_with((Point(1, 12), Piece(PieceType.lion, Player.black, False)))
+    _targets = targets_lion(board, Point(1, 12))
+    assert_no_duplicates(_targets)
+    LION_1A_SQUARE = {f"1a-{sq}" for sq in ["1c", "1b", 
+                                            "2c", "2b", "2a", 
+                                            "3c", "3b", "3a", ]}
+    assert set(_targets) == LION_1A_SQUARE | {"1a-1a"}
+
+def test_lion_in_corner_with_friends():
+    board = board_with((Point(1, 12), Piece(PieceType.lion, Player.black, False)),
+                       (Point(1, 11), Piece(PieceType.copper_general, Player.black, False)),
+                       (Point(2, 11), Piece(PieceType.copper_general, Player.black, False)),
+                       (Point(2, 12), Piece(PieceType.copper_general, Player.black, False)),
+                       )
+    _targets = targets_lion(board, Point(1, 12))
+    assert_no_duplicates(_targets)
+    LION_1A_SQUARE = {f"1a-{sq}" for sq in ["1c", 
+                                            "2c", 
+                                            "3c", "3b", "3a", ]}
+    assert set(_targets) == LION_1A_SQUARE 
+
+def test_mirror_lion():
+    board_black = board_with((Point(4, 3), Piece(PieceType.lion, Player.black, False)))
+    board_white = board_with(
+        (rotate(Point(4, 3)), Piece(PieceType.lion, Player.white, False))
+    )
+
+    moves_black = piece_moves(board_black, Point(4, 3))
+    moves_white = piece_moves(board_white, rotate(Point(4, 3)))
+
+    rotated_black = {rotate_move(m) for m in moves_black}
+        
+    assert rotated_black == set(moves_white)
