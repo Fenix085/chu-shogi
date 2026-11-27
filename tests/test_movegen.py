@@ -67,37 +67,49 @@ def test_empty_board_count(piece_type, promoted, expected):
 
 
 def test_blocked_piece_friendly():
-    board = board_with((Point(6, 6), Piece(PieceType.rook, Player.black)), (Point(3, 6), Piece(PieceType.pawn, Player.black)))
+    board = board_with(
+        (Point(6, 6), Piece(PieceType.rook, Player.black)),
+        (Point(3, 6), Piece(PieceType.pawn, Player.black)),
+    )
     _targets = targets(board, Point(6, 6))
     assert len(_targets) == 19
     assert "7c" not in _targets
 
+
 def test_blocked_piece_hostile():
-    board = board_with((Point(6, 6), Piece(PieceType.rook, Player.black)), (Point(3, 6), Piece(PieceType.pawn, Player.white)))
+    board = board_with(
+        (Point(6, 6), Piece(PieceType.rook, Player.black)),
+        (Point(3, 6), Piece(PieceType.pawn, Player.white)),
+    )
     _targets = targets(board, Point(6, 6))
     assert len(_targets) == 20
     assert "7b" not in _targets
     assert "7c" in _targets
 
+
 def test_pawn_directions_black():
     board = board_with((Point(6, 6), Piece(PieceType.pawn, Player.black)))
     _targets = targets(board, Point(6, 6))
     assert _targets == {"7e"}
- 
+
+
 def test_pawn_directions_white():
     board = board_with((Point(6, 6), Piece(PieceType.pawn, Player.white)))
     _targets = targets(board, Point(6, 6))
     assert _targets == {"7g"}
 
+
 def test_gold_directions_black():
     board = board_with((Point(6, 6), Piece(PieceType.gold_general, Player.black)))
     _targets = targets(board, Point(6, 6))
-    assert _targets == {"6e", "7e", "8e", "6f", "8f", "7g"}  
+    assert _targets == {"6e", "7e", "8e", "6f", "8f", "7g"}
+
 
 def test_gold_directions_white():
     board = board_with((Point(6, 6), Piece(PieceType.gold_general, Player.white)))
     _targets = targets(board, Point(6, 6))
-    assert _targets == {"6g", "7e", "8g", "6f", "8f", "7g"}  
+    assert _targets == {"6g", "7e", "8g", "6f", "8f", "7g"}
+
 
 @pytest.mark.parametrize(
     "piece_type, promoted",
@@ -136,21 +148,27 @@ def test_gold_directions_white():
 )
 def test_mirror(piece_type, promoted):
     board_black = board_with((Point(4, 3), Piece(piece_type, Player.black, promoted)))
-    board_white = board_with((rotate(Point(4, 3)), Piece(piece_type, Player.white, promoted)))
+    board_white = board_with(
+        (rotate(Point(4, 3)), Piece(piece_type, Player.white, promoted))
+    )
 
     _targets_black = targets(board_black, Point(4, 3))
     _targets_white = targets(board_white, rotate(Point(4, 3)))
 
     _targets_black_rotated = set()
     for i in range(len(_targets_black)):
-        _targets_black_rotated.add(coords_from_point(rotate(point_from_coords(list(_targets_black)[i]))))
+        _targets_black_rotated.add(
+            coords_from_point(rotate(point_from_coords(list(_targets_black)[i])))
+        )
 
     assert _targets_black_rotated == _targets_white
+
 
 def test_pawn_last_rank_black():
     board = board_with((Point(1, 1), Piece(PieceType.pawn, Player.black, False)))
     _targets = targets(board, Point(1, 1))
     assert _targets == set()
+
 
 def test_pawn_last_rank_white():
     board = board_with((Point(12, 12), Piece(PieceType.pawn, Player.white, False)))
