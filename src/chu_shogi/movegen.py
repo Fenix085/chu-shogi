@@ -4,6 +4,28 @@ from .pieces import Movement, rules_for, ALL_DIRECTIONS
 
 LION_OFFSETS = tuple((dr, dc) for dr in range(-2, 3) for dc in range(-2, 3) if (dr, dc) != (0, 0))
 
+def _lion_area_moves(board: Board, point: Point, colour: Player) -> list[Move]:
+    moves = []
+    for dr, dc in LION_OFFSETS:
+        target = point.offset(dr, dc)
+        if _can_land(board, target, colour):
+            moves.append(Move(point, target))
+
+    for dr, dc in ALL_DIRECTIONS:
+        a = point.offset(dr, dc)
+        p = board.get(a)
+        if p is None or p.colour == colour:
+            continue
+        for dr2, dc2 in ALL_DIRECTIONS:
+            b = a.offset(dr2, dc2)
+            if b == point:
+                moves.append(Move(point, point, via=a)) # igui
+            elif _can_land(board, b, colour):
+                moves.append(Move(point, b, via=a))
+    return moves
+    
+    
+
 def piece_moves(board: Board, point: Point) -> list[Move]:
     piece = board.get(point)
     if piece is None:
@@ -28,12 +50,9 @@ def piece_moves(board: Board, point: Point) -> list[Move]:
                     else:
                         break
             case (Movement.lion_area, None):
-                for dr, dc in LION_OFFSETS:
-                    target = point.offset(dr, dc)
-                    if _can_land(board, target, piece.colour):
-                        moves.append(Move(point, target))
+                moves += _lion_area_moves(board, point, colour=piece.colour)
                 can_pass = can_pass or _any_empty(board, point, ALL_DIRECTIONS)
-                
+
             case _:
                 raise NotImplementedError(f"{rule} is not implemented")
     if can_pass:

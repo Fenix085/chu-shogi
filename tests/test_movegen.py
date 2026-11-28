@@ -217,6 +217,26 @@ def test_lion_with_friends():
                                             "9d", "9e", "9f", "9g", "9h"]}
     assert set(_targets) == LION_7F_SQUARE
 
+def test_lion_with_foe():
+    board = board_with((Point(6, 6), Piece(PieceType.lion, Player.black, False)), 
+    (Point(5, 6), Piece(PieceType.copper_general, Player.white, False)),)
+    plain = {f"7f-{sq}" for sq in ["5d", "5e", "5f", "5g", "5h", 
+                                    "6d", "6e", "6f", "6g", "6h", 
+                                    "7d", "7e", "7g", "7h", 
+                                    "8d", "8e", "8f", "8g", "8h", 
+                                    "9d", "9e", "9f", "9g", "9h"]}
+    
+    via_moves = {f"7f-7e-{sq}" for sq in ["6d", "6e", "6f",
+                                        "7d",
+                                        "8d", "8e", "8f",]}
+
+    igui = {"7f-7e-7f"}
+
+    _targets = targets_lion(board, Point(6, 6))
+    assert_no_duplicates(_targets)
+    assert set(_targets) == plain | via_moves | igui | {"7f-7f"}
+    
+
 def test_lion_in_corner():
     board = board_with((Point(1, 12), Piece(PieceType.lion, Player.black, False)))
     _targets = targets_lion(board, Point(1, 12))
