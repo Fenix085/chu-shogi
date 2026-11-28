@@ -2,7 +2,10 @@ from .shogitypes import Point, Move, Player
 from .shogiboard import Board
 from .pieces import Movement, rules_for, ALL_DIRECTIONS
 
-LION_OFFSETS = tuple((dr, dc) for dr in range(-2, 3) for dc in range(-2, 3) if (dr, dc) != (0, 0))
+LION_OFFSETS = tuple(
+    (dr, dc) for dr in range(-2, 3) for dc in range(-2, 3) if (dr, dc) != (0, 0)
+)
+
 
 def _lion_area_moves(board: Board, point: Point, colour: Player) -> list[Move]:
     moves = []
@@ -19,12 +22,11 @@ def _lion_area_moves(board: Board, point: Point, colour: Player) -> list[Move]:
         for dr2, dc2 in ALL_DIRECTIONS:
             b = a.offset(dr2, dc2)
             if b == point:
-                moves.append(Move(point, point, via=a)) # igui
+                moves.append(Move(point, point, via=a))  # igui
             elif _can_land(board, b, colour):
                 moves.append(Move(point, b, via=a))
     return moves
-    
-    
+
 
 def piece_moves(board: Board, point: Point) -> list[Move]:
     piece = board.get(point)
@@ -74,6 +76,7 @@ def _can_land(board: Board, target: Point, colour: Player) -> bool:
             return False
     else:
         return False
+
 
 def _any_empty(board: Board, point: Point, dirs: tuple) -> bool:
     for dr, dc in dirs:
