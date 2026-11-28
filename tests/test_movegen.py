@@ -83,8 +83,8 @@ def test_king_in_middle():
         (PieceType.phoenix, True, 43),  # queen
         # --------------------------------------------------
         (PieceType.blind_tiger, True, 17),  # flying stag
-        # horned_falcon skipped
-        # soaring_eagle skipped
+        (PieceType.dragon_horse, True, 41),# horned_falcon
+        (PieceType.dragon_king, True, 38),# soaring_eagle
         (PieceType.drunk_elephant, True, 8),  # prince
         (PieceType.reverse_chariot, True, 22),  # whale
         (PieceType.lance, True, 21),  # white horse
@@ -181,8 +181,8 @@ def test_gold_directions_white():
         (PieceType.phoenix, True),  # queen
         # --------------------------------------------------
         (PieceType.blind_tiger, True),  # flying stag
-        # horned_falcon skipped
-        # soaring_eagle skipped
+        (PieceType.dragon_horse, True),# horned_falcon
+        (PieceType.dragon_king, True),# soaring_eagle
         (PieceType.drunk_elephant, True),  # prince
         (PieceType.reverse_chariot, True),  # whale
         (PieceType.lance, True),  # white horse
@@ -496,3 +496,51 @@ def test_lion_in_corner_with_friends():
         ]
     }
     assert set(_targets) == LION_1A_SQUARE
+
+def test_falcon_with_foe():
+    board = board_with((Point(6, 6), Piece(PieceType.dragon_horse, Player.black, True)),
+                       (Point(5, 6), Piece(PieceType.copper_general, Player.white, False)),)
+    _board = board_with((Point(6, 6), Piece(PieceType.queen, Player.black, False)))
+
+    _targets = targets_lion(board, Point(6, 6))
+    assert_no_duplicates(_targets)
+    expected = targets_lion(_board, Point(6, 6))
+    expected = set(expected) - {"7f-7c", "7f-7b", "7f-7a" }
+    assert set(_targets) == expected | {"7f-7e-7f", "7f-7e-7d"}
+
+def test_falcon_with_2foes():
+    board = board_with((Point(6, 6), Piece(PieceType.dragon_horse, Player.black, True)),
+                       (Point(5, 6), Piece(PieceType.copper_general, Player.white, False)),
+                       (Point(4, 6), Piece(PieceType.copper_general, Player.white, False)),)
+    _board = board_with((Point(6, 6), Piece(PieceType.queen, Player.black, False)))
+
+    _targets = targets_lion(board, Point(6, 6))
+    assert_no_duplicates(_targets)
+    expected = targets_lion(_board, Point(6, 6))
+    expected = set(expected) - {"7f-7c", "7f-7b", "7f-7a" }
+    assert set(_targets) == expected | {"7f-7e-7f", "7f-7e-7d"}
+
+def test_eagle_friend_pass():
+    board = board_with((Point(6, 6), Piece(PieceType.dragon_king, Player.black, True)),
+                    (Point(5, 7), Piece(PieceType.copper_general, Player.black, False)),)
+    _board = board_with((Point(6, 6), Piece(PieceType.queen, Player.black, False)))
+     
+    _targets = targets_lion(board, Point(6, 6))
+    assert_no_duplicates(_targets)
+    expected = targets_lion(_board, Point(6, 6))
+    expected = set(expected) - {"7f-10c", "7f-11b", "7f-12a",
+                                "7f-6e", "7f-4c", "7f-3b", "7f-2a" }
+    assert set(_targets) == expected | {"7f-7f"}
+
+def test_eagle_friends_no_pass():
+    board = board_with((Point(6, 6), Piece(PieceType.dragon_king, Player.black, True)),
+                    (Point(5, 7), Piece(PieceType.copper_general, Player.black, False)),
+                    (Point(5, 5), Piece(PieceType.copper_general, Player.black, False)),)
+    _board = board_with((Point(6, 6), Piece(PieceType.queen, Player.black, False)))
+     
+    _targets = targets_lion(board, Point(6, 6))
+    assert_no_duplicates(_targets)
+    expected = targets_lion(_board, Point(6, 6))
+    expected = set(expected) - {"7f-8e", "7f-10c", "7f-11b", "7f-12a",
+                                "7f-6e", "7f-4c", "7f-3b", "7f-2a" }
+    assert set(_targets) == expected

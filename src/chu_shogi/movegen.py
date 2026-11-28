@@ -27,6 +27,20 @@ def _lion_area_moves(board: Board, point: Point, colour: Player) -> list[Move]:
                 moves.append(Move(point, b, via=a))
     return moves
 
+def _lion_line_moves(board: Board, point: Point, colour: Player, dr: int, dc: int) -> list[Move]:
+    moves = []
+    d1 = point.offset(dr, dc)
+    d2 = point.offset(2 * dr, 2 * dc)
+    if _can_land(board, d1, colour):
+        moves.append(Move(point, d1))
+    if _can_land(board, d2, colour):
+        moves.append(Move(point, d2))
+    p = board.get(d1)
+    if p is not None and p.colour != colour:
+        moves.append(Move(point, point, via=d1)) # igui
+        if _can_land(board, d2, colour):
+            moves.append(Move(point, d2, via=d1))
+    return moves
 
 def piece_moves(board: Board, point: Point) -> list[Move]:
     piece = board.get(point)
@@ -54,6 +68,11 @@ def piece_moves(board: Board, point: Point) -> list[Move]:
             case (Movement.lion_area, None):
                 moves += _lion_area_moves(board, point, colour=piece.colour)
                 can_pass = can_pass or _any_empty(board, point, ALL_DIRECTIONS)
+
+            case (Movement.lion_line, (dr, dc)):
+                moves += _lion_line_moves(board, point, colour=piece.colour, dr=dr, dc=dc)
+                can_pass = can_pass or _any_empty(board, point, ((dr, dc),))
+
 
             case _:
                 raise NotImplementedError(f"{rule} is not implemented")
