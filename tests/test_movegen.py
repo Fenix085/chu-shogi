@@ -3,7 +3,7 @@ import pytest
 from chu_shogi.movegen import piece_moves
 from chu_shogi.shogiboard import Board
 from chu_shogi.shogitypes import Point, Player, Piece, PieceType, Move
-from chu_shogi.utils import coords_from_point, point_from_coords, move_to_str, move_from_str
+from chu_shogi.utils import coords_from_point, move_to_str
 from chu_shogi.layout import rotate
 
 
@@ -41,7 +41,7 @@ def test_king_in_middle():
     [
         (PieceType.king, False, 8),
         (PieceType.queen, False, 43),
-        # lion skipped
+        (PieceType.lion, False, 25),
         (PieceType.rook, False, 22),
         (PieceType.bishop, False, 21),
         (PieceType.dragon_king, False, 26),
@@ -61,6 +61,17 @@ def test_king_in_middle():
         (PieceType.go_between, False, 2),
         (PieceType.pawn, False, 1),
         # --------------------------------------------------
+        (PieceType.go_between, True, 7), # drunk elephant
+        (PieceType.pawn, True, 6), # gold general
+        (PieceType.bishop, True, 25), # dragon horse
+        (PieceType.rook, True, 26), # dragon king
+        (PieceType.ferocious_leopard, True, 21), # bishop
+        (PieceType.copper_general, True, 13), # side mover
+        (PieceType.silver_general, True, 13), # vertical mover
+        (PieceType.gold_general, True, 22), # rook
+        (PieceType.kirin, True, 25), # lion
+        (PieceType.phoenix, True, 43), # queen
+        # --------------------------------------------------
         (PieceType.blind_tiger, True, 17),  # flying stag
         # horned_falcon skipped
         # soaring_eagle skipped
@@ -73,7 +84,8 @@ def test_king_in_middle():
 )
 def test_empty_board_count(piece_type, promoted, expected):
     board = board_with((Point(6, 6), Piece(piece_type, Player.black, promoted)))
-    _targets = targets(board, Point(6, 6))
+    _targets = targets_lion(board, Point(6, 6))
+    assert_no_duplicates(_targets)
     assert len(_targets) == expected
 
 
@@ -127,7 +139,7 @@ def test_gold_directions_white():
     [
         (PieceType.king, False),
         (PieceType.queen, False),
-        # lion skipped
+        (PieceType.lion, False),
         (PieceType.rook, False),
         (PieceType.bishop, False),
         (PieceType.dragon_king, False),
@@ -147,6 +159,17 @@ def test_gold_directions_white():
         (PieceType.go_between, False),
         (PieceType.pawn, False),
         # --------------------------------------------------
+        (PieceType.go_between, True), # drunk elephant
+        (PieceType.pawn, True), # gold general
+        (PieceType.bishop, True), # dragon horse
+        (PieceType.rook, True), # dragon king
+        (PieceType.ferocious_leopard, True), # bishop
+        (PieceType.copper_general, True), # side mover
+        (PieceType.silver_general, True), # vertical mover
+        (PieceType.gold_general, True), # rook
+        (PieceType.kirin, True), # lion
+        (PieceType.phoenix, True), # queen
+        # --------------------------------------------------
         (PieceType.blind_tiger, True),  # flying stag
         # horned_falcon skipped
         # soaring_eagle skipped
@@ -163,16 +186,12 @@ def test_mirror(piece_type, promoted):
         (rotate(Point(4, 3)), Piece(piece_type, Player.white, promoted))
     )
 
-    _targets_black = targets(board_black, Point(4, 3))
-    _targets_white = targets(board_white, rotate(Point(4, 3)))
+    moves_black = piece_moves(board_black, Point(4, 3))
+    moves_white = piece_moves(board_white, rotate(Point(4, 3)))
 
-    _targets_black_rotated = set()
-    for i in range(len(_targets_black)):
-        _targets_black_rotated.add(
-            coords_from_point(rotate(point_from_coords(list(_targets_black)[i])))
-        )
-
-    assert _targets_black_rotated == _targets_white
+    rotated_black = {rotate_move(m) for m in moves_black}
+        
+    assert rotated_black == set(moves_white)
 
 
 def test_pawn_last_rank_black():
@@ -235,7 +254,45 @@ def test_lion_with_foe():
     _targets = targets_lion(board, Point(6, 6))
     assert_no_duplicates(_targets)
     assert set(_targets) == plain | via_moves | igui | {"7f-7f"}
+
+def test_lion_with_2_foes():
+    board = board_with((Point(6, 6), Piece(PieceType.lion, Player.black, False)), 
+    (Point(5, 6), Piece(PieceType.copper_general, Player.white, False)),
+    (Point(5, 7), Piece(PieceType.copper_general, Player.white, False)),)
+    plain = {f"7f-{sq}" for sq in ["5d", "5e", "5f", "5g", "5h", 
+                                    "6d", "6e", "6f", "6g", "6h", 
+                                    "7d", "7e", "7g", "7h", 
+                                    "8d", "8e", "8f", "8g", "8h", 
+                                    "9d", "9e", "9f", "9g", "9h"]}
     
+    via_moves = {f"7f-7e-{sq}" for sq in ["6d", "6e", "6f",
+                                        "7d",
+                                        "8d", "8e", "8f",]}
+    
+    via_moves_2 = {f"7f-6e-{sq}" for sq in ["5d", "5e", "5f",
+                                            "6d", "6f",
+                                            "7d", "7e", ]}
+
+    igui = {"7f-7e-7f"}
+    igui2 = {"7f-6e-7f"}
+
+    _targets = targets_lion(board, Point(6, 6))
+    assert_no_duplicates(_targets)
+    assert set(_targets) == plain | via_moves | via_moves_2 | igui | igui2 | {"7f-7f"}
+
+
+def test_lion_with_foe_2_squares_away():
+    board = board_with((Point(6, 6), Piece(PieceType.lion, Player.black, False)), 
+    (Point(4, 6), Piece(PieceType.copper_general, Player.white, False)),)
+    plain = {f"7f-{sq}" for sq in ["5d", "5e", "5f", "5g", "5h", 
+                                    "6d", "6e", "6f", "6g", "6h", 
+                                    "7d", "7e", "7g", "7h", 
+                                    "8d", "8e", "8f", "8g", "8h", 
+                                    "9d", "9e", "9f", "9g", "9h"]}
+
+    _targets = targets_lion(board, Point(6, 6))
+    assert_no_duplicates(_targets)
+    assert set(_targets) == plain | {"7f-7f"}
 
 def test_lion_in_corner():
     board = board_with((Point(1, 12), Piece(PieceType.lion, Player.black, False)))
@@ -258,16 +315,3 @@ def test_lion_in_corner_with_friends():
                                             "2c", 
                                             "3c", "3b", "3a", ]}
     assert set(_targets) == LION_1A_SQUARE 
-
-def test_mirror_lion():
-    board_black = board_with((Point(4, 3), Piece(PieceType.lion, Player.black, False)))
-    board_white = board_with(
-        (rotate(Point(4, 3)), Piece(PieceType.lion, Player.white, False))
-    )
-
-    moves_black = piece_moves(board_black, Point(4, 3))
-    moves_white = piece_moves(board_white, rotate(Point(4, 3)))
-
-    rotated_black = {rotate_move(m) for m in moves_black}
-        
-    assert rotated_black == set(moves_white)
